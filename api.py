@@ -47,10 +47,10 @@ def build_query(
 # Get all logs
 @app.get('/logs')
 def get_logs(
-        skip: int = 0,
-        limit: int = 10,
-        start_time: str = None,
-        end_time: str = None
+        skip: int = Query(0, ge=0, description="Number of logs to skip"),
+        limit: int = Query(10, ge=1, le=max_limit,description="Maximum number of logs to retrieve, max is 1000"),
+        start_time: str = Query(None, description="Start time for filtering logs in ISO 8601 format (e.g., 2024-10-01T00:00:00)"),
+        end_time: str = Query(None, description="End time for filtering logs in ISO 8601 format (e.g., 2024-10-31T23:59:59)")
 ):
     if limit == 0:
         return []
@@ -73,10 +73,10 @@ def get_logs(
 @app.get('/logs/{user_id}')
 def get_logs_by_user(
         user_id: int,
-        skip: int = 0,
-        limit: int = 10,
-        start_time: str = None,
-        end_time: str = None
+        skip: int = Query(0, ge=0, description="Number of logs to skip"),
+        limit: int = Query(10, ge=1, le=max_limit, description="Maximum number of logs to retrieve, max is 1000"),
+        start_time: str = Query(None, description="Start time for filtering logs in ISO 8601 format (e.g., 2024-10-01T00:00:00)"),
+        end_time: str = Query(None, description="End time for filtering logs in ISO 8601 format (e.g., 2024-10-31T23:59:59)")
 ):
     if limit < 0:
         raise HTTPException(status_code=400, detail="Limit must be a non-negative integer.")
