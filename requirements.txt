@@ -4,3 +4,4 @@ python-dotenv==1.0.1
 python-telegram-bot==21.6
 requests==2.32.3
 uvicorn==0.31.0
+pytest==8.3.3
