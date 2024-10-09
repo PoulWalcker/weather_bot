@@ -8,6 +8,7 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+
   weather-api:
     build: .
     container_name: weather-api
@@ -17,6 +18,7 @@ services:
       - mongodb
     environment:
       - MONGO_URI=mongodb://mongo_db:27017/
+
   weather-bot:
     build: .
     container_name: weather-bot
