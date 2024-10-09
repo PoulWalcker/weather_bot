@@ -29,14 +29,17 @@ def build_query(
             start_dt = datetime.fromisoformat(start_time)
             query["timestamp"] = {"$gte": start_dt}
         except ValueError:
-            raise HTTPException(status_code=400,detail="Invalid start_time format. Use ISO format.")
+            raise HTTPException(status_code=400, detail="Invalid start_time format. Use ISO format.")
 
     if end_time:
         try:
             end_dt = datetime.fromisoformat(end_time)
-            query["timestamp"] = {"$gte": end_dt}
+            if "timestamp" in query:
+                query["timestamp"]["$lte"] = end_dt
+            else:
+                query["timestamp"] = {"$lte": end_dt}
         except ValueError:
-            raise HTTPException(status_code=400,detail="Invalid end_time format. Use ISO format.")
+            raise HTTPException(status_code=400, detail="Invalid end_time format. Use ISO format.")
 
     return query
 
@@ -49,6 +52,8 @@ def get_logs(
         start_time: str = None,
         end_time: str = None
 ):
+    if limit == 0:
+        return []
     if limit < 0:
         raise HTTPException(status_code=400, detail="Limit must be a non-negative integer.")
     if limit > max_limit:
@@ -56,10 +61,11 @@ def get_logs(
 
     query = build_query(start_time=start_time, end_time=end_time)
 
-    logs_data = list(logs.find(query).limit(limit).skip(skip))
+    logs_data = list(logs.find(query).skip(skip))
     for log in logs_data:
         log['_id'] = str(log['_id'])
-        log['timestamp'] = log['timestamp'].isoformat()
+        if isinstance(log['timestamp'],datetime):
+            log['timestamp'] = log['timestamp'].isoformat()
     return logs_data
 
 
@@ -82,7 +88,8 @@ def get_logs_by_user(
     logs_data = list(logs.find(query).limit(limit).skip(skip))
     for log in logs_data:
         log['_id'] = str(log['_id'])
-        log['timestamp'] = log['timestamp'].isoformat()
+        if isinstance(log['timestamp'],datetime):
+            log['timestamp'] = log['timestamp'].isoformat()
     return logs_data
 
 

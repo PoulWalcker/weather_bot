@@ -1,0 +1,37 @@
+[
+  {
+    "_id": "670697011fb972b3f813552b",
+    "user_id": 430450773,
+    "command": "/weather sb",
+    "response": "Failed to fetch weather data. Error: HTTP error occurred: 404 Client Error: Not Found for url: ...",
+    "timestamp": "2024-10-09T14:45:21.877000"
+  },
+  {
+    "_id": "670697061fb972b3f813552c",
+    "user_id": 430450773,
+    "command": "/weather dubai",
+    "response": "Temperature: 33 cels.\nFeels like: 37.81 cels. \nDescription: clear sky. \nHumidity: 55%.\nWind Speed: 5.14 m/s",
+    "timestamp": "2024-10-09T14:45:26.936000"
+  },
+  {
+    "_id": "6706970f1fb972b3f813552d",
+    "user_id": 430450773,
+    "command": "/weather moscow",
+    "response": "Temperature: 6.72 cels.\nFeels like: 4.61 cels. \nDescription: overcast clouds. \nHumidity: 76%.\nWind Speed: 2.95 m/s",
+    "timestamp": "2024-10-09T14:45:35.552000"
+  },
+  {
+    "_id": "670697121fb972b3f813552e",
+    "user_id": 430450773,
+    "command": "/weather ",
+    "response": "No city provided",
+    "timestamp": "2024-10-09T14:45:38.790000"
+  },
+  {
+    "_id": "6706971f1fb972b3f813552f",
+    "user_id": 430450773,
+    "command": "/weather moscow",
+    "response": "Temperature: 6.72 cels.\nFeels like: 4.61 cels. \nDescription: overcast clouds. \nHumidity: 76%.\nWind Speed: 2.95 m/s",
+    "timestamp": "2024-10-09T14:45:51.124000"
+  }
+]
