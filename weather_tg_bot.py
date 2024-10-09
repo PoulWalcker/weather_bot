@@ -18,8 +18,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def tg_weather_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    '''Get user's city input and send request to API'''
-
     user_id = update.message.from_user.id
     city = ' '.join(context.args).lower().strip()
 
