@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongo_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+  weather-api:
+    build: .
+    container_name: weather-api
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb
+  weather-bot:
+    build: .
+    container_name: weather-bot
+    depends_on:
+      - mongodb
+    command: python weather_tg_bot.py
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
