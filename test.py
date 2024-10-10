@@ -91,12 +91,15 @@ def test_get_logs_invalid_time_format():
 
 def test_limit_exceeds_max():
     response = client.get("/logs?limit=2000")
-    assert response.status_code == 200
+    assert response.status_code == 422
     data = response.json()
     assert len(data) <= 1000
 
 
 def test_negative_limit():
     response = client.get("/logs?limit=-1")
-    assert response.status_code == 400
-    assert "Limit must be a non-negative integer." in response.json()["detail"]
+    assert response.status_code == 422
+    error_detail = response.json()["detail"]
+    assert error_detail[0]["loc"] == ["query", "limit"]
+    assert error_detail[0]["msg"] == "Input should be greater than or equal to 0"
+    assert error_detail[0]["type"] == "greater_than_equal"

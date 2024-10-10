@@ -48,7 +48,7 @@ def build_query(
 @app.get('/logs')
 def get_logs(
         skip: int = Query(0, ge=0, description="Number of logs to skip"),
-        limit: int = Query(10, ge=1, le=max_limit,description="Maximum number of logs to retrieve, max is 1000"),
+        limit: int = Query(10, ge=0, le=max_limit,description="Maximum number of logs to retrieve, max is 1000"),
         start_time: str = Query(None, description="Start time for filtering logs in ISO 8601 format (e.g., 2024-10-01T00:00:00)"),
         end_time: str = Query(None, description="End time for filtering logs in ISO 8601 format (e.g., 2024-10-31T23:59:59)")
 ):
@@ -74,7 +74,7 @@ def get_logs(
 def get_logs_by_user(
         user_id: int,
         skip: int = Query(0, ge=0, description="Number of logs to skip"),
-        limit: int = Query(10, ge=1, le=max_limit, description="Maximum number of logs to retrieve, max is 1000"),
+        limit: int = Query(10, ge=0, le=max_limit, description="Maximum number of logs to retrieve, max is 1000"),
         start_time: str = Query(None, description="Start time for filtering logs in ISO 8601 format (e.g., 2024-10-01T00:00:00)"),
         end_time: str = Query(None, description="End time for filtering logs in ISO 8601 format (e.g., 2024-10-31T23:59:59)")
 ):
