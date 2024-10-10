@@ -3,7 +3,8 @@ import os
 import requests
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
-from database import log_request
+from database import log_request, user_settings_request, get_user_city
+import re
 
 load_dotenv()
 
@@ -12,22 +13,49 @@ WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
 BASE_WEATHER_URL = 'https://api.openweathermap.org/data/2.5/weather'
 
 
+# Utils
+def is_valid_city_name(city):
+    pattern = r'^[a-zA-Zа-яА-Я\s-]+$'
+    return re.match(pattern, city) is not None
+
+
 # Telegram Handlers
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="This is a weather bot. Enter the /weather <city> to get info.")
+    await context.bot.send_message(chat_id=update.effective_chat.id, text='This is a weather bot. Enter the /weather <city> to get info.')
+
+
+async def set_default_city(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.message.from_user.id
+    city = ' '.join(context.args).lower().strip()
+
+    if not city:
+        await update.message.reply_text('Please provide a city name, e.g /setcity Moscow')
+        log_request(user_id, f'/setcity {city}', 'No city provided')
+        return
+
+    if not is_valid_city_name(city):
+        await update.message.reply_text('Please provide a correct city name, e.g /setcity Moscow')
+        log_request(user_id, f'/setcity {city}', 'Incorrect city value: {city}')
+        return
+
+    user_settings_request(user_id, city)
+    log_request(user_id, f'/setcity {city}', 'Successfully done.')
+    await update.message.reply_text(f'The default city is set to: {city}')
 
 
 async def tg_weather_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
     city = ' '.join(context.args).lower().strip()
 
-    if len(context.args) == 0:
-        await update.message.reply_text("Please provide a city name, e.g., /weather Moscow")
-        log_request(user_id,f'/weather {city}', 'No city provided')
-        return
-    if not city.isalpha():
-        await update.message.reply_text('Please enter the correct city name.')
-        log_request(user_id, f'/weather{city}', f'Incorrect city value: {city}')
+    if not city:
+        city = get_user_city(user_id)
+        if not city:
+            await update.message.reply_text('Please, provide the city name or set it by default with /setcity.')
+            return
+
+    if not is_valid_city_name(city):
+        await update.message.reply_text('Please provide a correct city name, e.g /weather Moscow')
+        log_request(user_id, f'/weather {city}','Incorrect city value: {city}')
         return
 
     weather_data_json, err = await fetch_weather_data(city)
@@ -52,13 +80,13 @@ async def fetch_weather_data(city):
         response.raise_for_status()
         return response.json(), None
     except requests.exceptions.HTTPError as http_err:
-        error_message = f"HTTP error occurred: {http_err}"
+        error_message = f'HTTP error occurred: {http_err}'
     except requests.exceptions.ConnectionError:
-        error_message = "Error: Could not connect to the weather service."
+        error_message = 'Error: Could not connect to the weather service.'
     except requests.exceptions.Timeout:
-        error_message = "Error: Request to weather service timed out."
+        error_message = 'Error: Request to weather service timed out.'
     except requests.exceptions.RequestException as err:
-        error_message = f"An error occurred: {err}"
+        error_message = f'An error occurred: {err}'
     print(error_message)
     return None, error_message
 
@@ -92,7 +120,9 @@ if __name__ == '__main__':
 
     start_handler = CommandHandler('start', start)
     weather_handler = CommandHandler('weather', tg_weather_input)
+    city_handler = CommandHandler('setcity', set_default_city)
     application.add_handler(start_handler)
     application.add_handler(weather_handler)
+    application.add_handler(city_handler)
 
     application.run_polling()

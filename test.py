@@ -46,13 +46,13 @@ def test_get_logs():
 
 
 def test_get_logs_with_time_filter():
-    response = client.get("/logs?skip=0&limit=10&start_time=2024-10-09T14:45:25&end_time=2024-10-09T14:45:40")
+    response = client.get('/logs?skip=0&limit=10&start_time=2024-10-09T14:45:25&end_time=2024-10-09T14:45:40')
     assert response.status_code == 200
     data = response.json()
     assert isinstance(data, list)
     for log in data:
         timestamp = datetime.fromisoformat(log['timestamp'])
-        assert datetime.fromisoformat("2024-10-09T14:45:25") <= timestamp <= datetime.fromisoformat("2024-10-09T14:45:40")
+        assert datetime.fromisoformat('2024-10-09T14:45:25') <= timestamp <= datetime.fromisoformat('2024-10-09T14:45:40')
 
 
 def test_get_logs_by_user():
@@ -67,39 +67,39 @@ def test_get_logs_by_user():
 
 def test_get_logs_by_user_with_time_filter():
     user_id = 430450773
-    response = client.get(f"/logs/{user_id}?skip=0&limit=10&start_time=2024-10-09T14:45:25&end_time=2024-10-09T14:45:40")
+    response = client.get(f'/logs/{user_id}?skip=0&limit=10&start_time=2024-10-09T14:45:25&end_time=2024-10-09T14:45:40')
     assert response.status_code == 200
     data = response.json()
     assert isinstance(data, list)
     for log in data:
         assert log['user_id'] == user_id
         timestamp = datetime.fromisoformat(log['timestamp'])
-        assert datetime.fromisoformat("2024-10-09T14:45:25") <= timestamp <= datetime.fromisoformat("2024-10-09T14:45:40")
+        assert datetime.fromisoformat('2024-10-09T14:45:25') <= timestamp <= datetime.fromisoformat('2024-10-09T14:45:40')
 
 
 def test_get_logs_invalid_user():
-    response = client.get("/logs/999999999")
+    response = client.get('/logs/999999999')
     assert response.status_code == 200
     assert response.json() == []
 
 
 def test_get_logs_invalid_time_format():
-    response = client.get("/logs?start_time=invalid_time_format")
+    response = client.get('/logs?start_time=invalid_time_format')
     assert response.status_code == 400
-    assert "Invalid start_time format." in response.json()["detail"]
+    assert 'Invalid start_time format.' in response.json()['detail']
 
 
 def test_limit_exceeds_max():
-    response = client.get("/logs?limit=2000")
+    response = client.get('/logs?limit=2000')
     assert response.status_code == 422
     data = response.json()
     assert len(data) <= 1000
 
 
 def test_negative_limit():
-    response = client.get("/logs?limit=-1")
+    response = client.get('/logs?limit=-1')
     assert response.status_code == 422
-    error_detail = response.json()["detail"]
-    assert error_detail[0]["loc"] == ["query", "limit"]
-    assert error_detail[0]["msg"] == "Input should be greater than or equal to 0"
-    assert error_detail[0]["type"] == "greater_than_equal"
+    error_detail = response.json()['detail']
+    assert error_detail[0]['loc'] == ['query', 'limit']
+    assert error_detail[0]['msg'] == 'Input should be greater than or equal to 0'
+    assert error_detail[0]['type'] == 'greater_than_equal'

@@ -27,19 +27,19 @@ def build_query(
     if start_time:
         try:
             start_dt = datetime.fromisoformat(start_time)
-            query["timestamp"] = {"$gte": start_dt}
+            query['timestamp'] = {'$gte': start_dt}
         except ValueError:
-            raise HTTPException(status_code=400, detail="Invalid start_time format. Use ISO format.")
+            raise HTTPException(status_code=400, detail='Invalid start_time format. Use ISO format.')
 
     if end_time:
         try:
             end_dt = datetime.fromisoformat(end_time)
-            if "timestamp" in query:
-                query["timestamp"]["$lte"] = end_dt
+            if 'timestamp' in query:
+                query['timestamp']['$lte'] = end_dt
             else:
-                query["timestamp"] = {"$lte": end_dt}
+                query['timestamp'] = {'$lte': end_dt}
         except ValueError:
-            raise HTTPException(status_code=400, detail="Invalid end_time format. Use ISO format.")
+            raise HTTPException(status_code=400, detail='Invalid end_time format. Use ISO format.')
 
     return query
 
@@ -47,15 +47,15 @@ def build_query(
 # Get all logs
 @app.get('/logs')
 def get_logs(
-        skip: int = Query(0, ge=0, description="Number of logs to skip"),
-        limit: int = Query(10, ge=0, le=max_limit,description="Maximum number of logs to retrieve, max is 1000"),
-        start_time: str = Query(None, description="Start time for filtering logs in ISO 8601 format (e.g., 2024-10-01T00:00:00)"),
-        end_time: str = Query(None, description="End time for filtering logs in ISO 8601 format (e.g., 2024-10-31T23:59:59)")
+        skip: int = Query(0, ge=0, description='Number of logs to skip'),
+        limit: int = Query(10, ge=0, le=max_limit,description='Maximum number of logs to retrieve, max is 1000'),
+        start_time: str = Query(None, description='Start time for filtering logs in ISO 8601 format (e.g., 2024-10-01T00:00:00)'),
+        end_time: str = Query(None, description='End time for filtering logs in ISO 8601 format (e.g., 2024-10-31T23:59:59)')
 ):
     if limit == 0:
         return []
     if limit < 0:
-        raise HTTPException(status_code=400, detail="Limit must be a non-negative integer.")
+        raise HTTPException(status_code=400, detail='Limit must be a non-negative integer.')
     if limit > max_limit:
         limit = max_limit
 
@@ -73,13 +73,13 @@ def get_logs(
 @app.get('/logs/{user_id}')
 def get_logs_by_user(
         user_id: int,
-        skip: int = Query(0, ge=0, description="Number of logs to skip"),
-        limit: int = Query(10, ge=0, le=max_limit, description="Maximum number of logs to retrieve, max is 1000"),
-        start_time: str = Query(None, description="Start time for filtering logs in ISO 8601 format (e.g., 2024-10-01T00:00:00)"),
-        end_time: str = Query(None, description="End time for filtering logs in ISO 8601 format (e.g., 2024-10-31T23:59:59)")
+        skip: int = Query(0, ge=0, description='Number of logs to skip'),
+        limit: int = Query(10, ge=0, le=max_limit, description='Maximum number of logs to retrieve, max is 1000'),
+        start_time: str = Query(None, description='Start time for filtering logs in ISO 8601 format (e.g., 2024-10-01T00:00:00)'),
+        end_time: str = Query(None, description='End time for filtering logs in ISO 8601 format (e.g., 2024-10-31T23:59:59)')
 ):
     if limit < 0:
-        raise HTTPException(status_code=400, detail="Limit must be a non-negative integer.")
+        raise HTTPException(status_code=400, detail='Limit must be a non-negative integer.')
     if limit > max_limit:
         limit = max_limit
 
@@ -88,11 +88,11 @@ def get_logs_by_user(
     logs_data = list(logs.find(query).limit(limit).skip(skip))
     for log in logs_data:
         log['_id'] = str(log['_id'])
-        if isinstance(log['timestamp'],datetime):
+        if isinstance(log['timestamp'], datetime):
             log['timestamp'] = log['timestamp'].isoformat()
     return logs_data
 
 
 if __name__ == '__main__':
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host='127.0.0.1', port=8000)
