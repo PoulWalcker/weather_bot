@@ -25,6 +25,10 @@ async def tg_weather_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Please provide a city name, e.g., /weather Moscow")
         log_request(user_id,f'/weather {city}', 'No city provided')
         return
+    if not city.isalpha():
+        await update.message.reply_text('Please enter the correct city name.')
+        log_request(user_id, f'/weather{city}', f'Incorrect city value: {city}')
+        return
 
     weather_data_json, err = await fetch_weather_data(city)
     if not weather_data_json:
@@ -42,6 +46,7 @@ async def tg_weather_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # API Calls
 async def fetch_weather_data(city):
     url = f'{BASE_WEATHER_URL}?q={city}&appid={WEATHER_API_KEY}&units=metric&lang=en'
+
     try:
         response = requests.get(url)
         response.raise_for_status()
