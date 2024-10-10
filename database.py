@@ -27,7 +27,7 @@ def user_settings_request(user_id, city):
     try:
         user_settings.update_one(
             {'user_id': user_id},
-            {'city': city},
+            {'$set': {'city': city}},
             upsert=True
         )
     except Exception as e:
@@ -38,6 +38,6 @@ def get_user_city(user_id):
     user_settings_data = user_settings.find_one({'user_id': user_id})
 
     if user_settings_data:
-        return user_settings['city']
+        return user_settings_data['city']
     else:
         return None
